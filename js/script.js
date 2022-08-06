@@ -1,5 +1,3 @@
-'use strict';
-
 const movieDB = {
     movies: [
         "Логан",
@@ -10,26 +8,69 @@ const movieDB = {
     ]
 };
 
-const ad = document.querySelectorAll(".promo__adv"),
+const adv = document.querySelectorAll(".promo__adv"),
       poster = document.querySelector(".promo__bg"),
       genre = document.querySelector(".promo__genre"),
-      list = document.querySelector(".promo__interactive-list");
+      movieList  = document.querySelector(".promo__interactive-list"),
+      textArea = document.querySelector('.form'),
+      input = document.querySelector('.adding__input'),
+      checkbox = document.querySelector('[type="checkbox"]'),
+      addForm = document.querySelector('form.add'),
+      delbtns = document.querySelectorAll('.delete');
 
+addForm.addEventListener('submit', (event)=>{
+    event.preventDefault();
+    let newFilm = input.value;
 
-ad.forEach(item => {
-    item.remove();
+    if(newFilm.length > 21){
+        newFilm = `${newFilm.substring(0,22)}...`;
+    }
+    if(newFilm){
+        movieDB.movies.push(newFilm);
+        sortArr(movieDB.movies);
+        
+        createMovieList(movieDB.movies, movieList);
+        if(checkbox.checked) console.log("Добавляем любимый фильм");
+    }
+
+    event.target.reset();
 });
 
-genre.textContent = 'Драма';
-poster.style.backgroundImage = `url(img/bg.jpg)`;
+function createMovieList(films, parent){
+    sortArr(films);
+    parent.innerHTML = '';
+    films.forEach((film, i)=>{
+       parent.innerHTML += `
+            <li class="promo__interactive-item">${i+1} ${film}
+                 <div class="delete"></div>
+            </li>
+        `;
+    });
 
-movieDB.movies.sort();
-list.innerHTML = "";
+    document.querySelectorAll('.delete').forEach((btn, i)=>{
+        btn.addEventListener('click', ()=>{
+            btn.parentElement.remove();
+            movieDB.movies.splice(i, 1);
+            createMovieList(films, parent);
+        });
+    });
 
-movieDB.movies.forEach((item,i) => {
-    list.innerHTML += `
-       <li class="promo__interactive-item">${i+1} ${item}
-            <div class="delete"></div>
-        </li>
-    `;
-});
+    
+}
+
+const sortArr = (arr)=>{
+    arr.sort();
+};
+const makeChanges = ()=>{
+    genre.textContent = 'Драма';
+    poster.style.backgroundImage = `url(img/bg.jpg)`;
+};
+const deleteAdv = (adv)=>{
+    adv.forEach(item => {
+        item.remove();
+    });
+};
+
+deleteAdv(adv);
+makeChanges();
+createMovieList(movieDB.movies, movieList);
